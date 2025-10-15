@@ -1,0 +1,21 @@
+# File: docker-compose.yml
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: favorites_web
+    ports:
+      - "9030:80"
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - web_services_network
+
+networks:
+  web_services_network:
+    # 외부 네트워크 이름이 'web_services_network'로
+    # 고정되었으므로 이 설정은 그대로 둡니다.
+    external: true

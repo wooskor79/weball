@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: shortener_web
+    restart: always
+    ports:
+      - "9010:80"
+    volumes:
+      - ./src:/var/www/html
+    # .env 파일에서 환경 변수를 읽어옵니다.
+    # DB_HOST를 포함한 모든 설정은 .env 파일에서 관리하는 것이 좋습니다.
+    env_file: .env
+    networks:
+      - web_services_network
+
+networks:
+  web_services_network:
+    external: true
+    name: shared-services_web_services_network
