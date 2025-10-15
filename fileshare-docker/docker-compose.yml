@@ -1,0 +1,20 @@
+# File: docker-compose.yml
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fileshare_web # 수정된 부분
+    ports:
+      - "9020:80" # 수정된 부분
+    volumes:
+      - ./src:/var/www/html # 수정된 부분
+    networks:
+      - web_services_network
+
+networks:
+  web_services_network:
+    external: true
+    name: web_services_network # 추가된 부분

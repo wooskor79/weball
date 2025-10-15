@@ -1,0 +1,9 @@
+.
+├── 1.txt
+├── db-init
+│   ├── 1_fileshare.sql
+│   ├── 2_shortener.sql
+│   └── 3_favorites.sql
+└── docker-compose.yml
+
+1 directory, 5 files
