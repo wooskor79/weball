@@ -1,5 +1,5 @@
 <?php
-// public/dashboard.php (폴더 개별 다운로드 버튼 추가)
+// public/dashboard.php (수정됨)
 require_once __DIR__ . '/../app/bootstrap.php';
 
 if (!is_logged_in()) {
@@ -12,10 +12,12 @@ $current_path_raw = $_GET['path'] ?? '';
 $current_path = sanitize_path($current_path_raw);
 $full_current_path = SHARE_FOLDER . $current_path;
 
-if (strpos(realpath($full_current_path), realpath(SHARE_FOLDER)) !== 0 || !is_dir($full_current_path)) {
-    header('Location: dashboard.php');
-    exit();
+// ⬇️ 수정된 부분: realpath가 실패하거나 디렉토리가 아닐 경우, 무한 리디렉션 대신 오류 메시지를 출력하고 실행을 중지합니다.
+if (realpath($full_current_path) === false || !is_dir($full_current_path) || strpos(realpath($full_current_path), realpath(SHARE_FOLDER)) !== 0) {
+    http_response_code(500);
+    die("오류: 설정된 공유 폴더(SHARE_FOLDER)를 찾을 수 없습니다. <br>1. app/config.php 파일의 경로가 올바른지 확인하세요. <br>2. docker-compose.yml 파일에 공유 폴더 볼륨 마운트가 올바르게 설정되었는지 확인하세요.");
 }
+
 
 $upload_message = '';
 $upload_error = false;
@@ -67,7 +69,6 @@ $sorted_items = array_merge($folders, $files);
 </head>
 <body>
     <div class="app-container">
-        <!-- 사이드바 -->
         <nav class="sidebar">
             <div class="sidebar-header"><h2>Menu</h2></div>
             <ul>
@@ -80,7 +81,6 @@ $sorted_items = array_merge($folders, $files);
             <div class="sidebar-footer"><p>Logged in as: <strong><?php echo e($_SESSION['username']); ?></strong></p></div>
         </nav>
 
-        <!-- 메인 컨텐츠 -->
         <main class="main-content">
             <header class="main-header">
                 <h1>File Share</h1>
@@ -98,7 +98,6 @@ $sorted_items = array_merge($folders, $files);
                 </nav>
             </header>
 
-            <!-- 업로드 폼 -->
             <?php if (is_admin()): ?>
             <section class="upload-section">
                 <h2>파일 업로드 (관리자)</h2>
@@ -116,7 +115,6 @@ $sorted_items = array_merge($folders, $files);
             </section>
             <?php endif; ?>
             
-            <!-- 다중 다운로드 폼 -->
             <form action="download.php" method="post" id="downloadForm">
                 <input type="hidden" name="path" value="<?php echo e($current_path); ?>">
                 <div class="download-controls">
@@ -130,7 +128,6 @@ $sorted_items = array_merge($folders, $files);
                     </div>
                 </div>
                 
-                <!-- 파일/폴더 목록 -->
                 <section class="file-grid" id="fileContainer">
                     <?php if (isset($files_error)): ?>
                         <p class="error-message"><?php echo e($files_error); ?></p>
@@ -143,8 +140,7 @@ $sorted_items = array_merge($folders, $files);
                                 <div class="file-card is-folder">
                                     <input type="checkbox" name="folders[]" value="<?php echo e($item); ?>" class="file-checkbox">
                                     <a href="download.php?path=<?php echo urlencode($current_path); ?>&folder=<?php echo urlencode($item); ?>" class="download-btn">다운로드</a>
-                                    <span class="file-size"></span> <!-- Placeholder for alignment -->
-                                    <div class="file-name">
+                                    <span class="file-size"></span> <div class="file-name">
                                         <a href="dashboard.php?path=<?php echo urlencode($current_path . '/' . $item); ?>" title="<?php echo e($item); ?>">
                                             <span class="folder-list-label">폴더</span><?php echo e($item); ?>
                                         </a>
@@ -172,4 +168,3 @@ $sorted_items = array_merge($folders, $files);
     <script src="js/main.js"></script>
 </body>
 </html>
-

@@ -6,15 +6,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: fileshare_web # 수정된 부분
+    container_name: fileshare_web
     ports:
-      - "9020:80" # 수정된 부분
+      - "9020:80"
     volumes:
-      - ./src:/var/www/html # 수정된 부분
+      - ./src:/var/www/html
+      # ⬇️ 이 부분을 추가해주세요!
+      - /volume1/ShareFolder/Share:/volume1/ShareFolder/Share
     networks:
       - web_services_network
 
 networks:
   web_services_network:
     external: true
-    name: web_services_network # 추가된 부분
+    name: web_services_network
